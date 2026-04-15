@@ -1,8 +1,13 @@
 //======================session============================
 
+if (!window.fetch) {
+  alert("Ton navigateur est trop ancien");
+}
+
 // session
+
 let nowtoken = sessionStorage.getItem("token");
-let expireTime = parseInt(sessionStorage.getItem("expireTime"));
+const expireTime = parseInt(sessionStorage.getItem("expireTime") || "0");
 
 let now = new Date().getTime();
 
@@ -12,10 +17,10 @@ if (!nowtoken || !expireTime || now > expireTime) {
 }
 
 // refresh session sur activité
-["click", "mousemove", "keypress"].forEach(event => {
+["click", "mousemove", "keydown"].forEach(event => {
     document.addEventListener(event, () => {
-        const newExpireTime = new Date().getTime() + 30 * 60 * 1000;
-        sessionStorage.setItem("expireTime", newExpireTime);
+        const newExpireTime = Date.now() + 30 * 60 * 1000;
+        sessionStorage.setItem("expireTime", String(newExpireTime));
     });
 });
 // Ajouter un écouteur d'événement pour réinitialiser le temps d'expiration à chaque mouvement de souris
@@ -93,6 +98,9 @@ async function fetchStudents() {
             action: "fetch_students"
         })
     });
+    if (!res.ok) {
+        throw new Error("Network error");
+    }
 
     // Récupération de la réponse
     const data = await res.json();
@@ -129,7 +137,7 @@ function displayStudents(dataToDisplay = students) {
     if (!table) return;
 
     table.innerHTML = "";
-    
+
     // Garder une trace des étudiants affichés pour l'export
     window.currentDisplayedStudents = dataToDisplay;
 
@@ -383,6 +391,9 @@ async function ajoutermodifierEtudiant(event) {
             body: JSON.stringify(dataToSend)
         });
 
+        if (!res.ok) {
+            throw new Error("Network error");
+        }
         const text = await res.json();
 
         if (text.success) {
@@ -391,10 +402,10 @@ async function ajoutermodifierEtudiant(event) {
             localStorage.setItem("studentsData", JSON.stringify(students));
             localStorage.removeItem("studentToEdit");
             localStorage.removeItem("editIndex");
-            
+
             const message = (code === "mdf") ? "Étudiant modifié ✅" : "Étudiant ajouté ✅";
             alert(message);
-            
+
             window.location.href = "list.html";
         }
 
@@ -511,11 +522,13 @@ async function deleteStudent(index) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                
+
                 matricule: x
             })
         });
-
+        if (!res.ok) {
+            throw new Error("Network error");
+        }
         const text = await res.json();
         console.log(text.success);
 

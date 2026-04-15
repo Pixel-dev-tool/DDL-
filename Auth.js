@@ -1,8 +1,7 @@
 function checkSession() {
     const token = sessionStorage.getItem("token");
-    const expireTime = parseInt(sessionStorage.getItem("expireTime"));
-
-    const now = new Date().getTime();
+    const expireTime = parseInt(sessionStorage.getItem("expireTime") || "0");
+    const now = Date.now();
 
     if (!token || !expireTime || now > expireTime) {
         sessionStorage.clear();
@@ -12,8 +11,8 @@ function checkSession() {
 
 // refresh session sur activité
 function refreshSession() {
-    const newExpireTime = new Date().getTime() + 30 * 60 * 1000;
-    sessionStorage.setItem("expireTime", newExpireTime);
+    const expireTime = Date.now() + 60 * 60 * 1000;
+    sessionStorage.setItem("expireTime", String(expireTime));
 }
 
 // events globaux

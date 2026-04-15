@@ -118,7 +118,7 @@ button:disabled {
 const LOGIN_WEBHOOK = "https://hook.us2.make.com/mpe4vm531rlkeltrmi70ksa1vi6wfnpq";
 
 // ENTER key support
-document.addEventListener("keypress", function(e) {
+document.addEventListener("keydown", function(e) {
   if (e.key === "Enter") login();
 });
 
